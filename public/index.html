@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SchemaGuard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>SchemaGuard</h1>
+    <label>Modo
+      <select id="mode">
+        <option value="beginner">Iniciante</option>
+        <option value="intermediate">Intermediário</option>
+        <option value="advanced">Avançado</option>
+      </select>
+    </label>
+    <button id="open-import" type="button">Importar SQL</button>
+  </header>
+
+  <main id="board">
+    <svg id="links" aria-hidden="true"></svg>
+    <p id="empty" hidden>Nenhuma tabela ainda. Clique em Importar SQL e cole seus CREATE TABLE.</p>
+  </main>
+
+  <dialog id="dlg">
+    <h2>Importar SQL</h2>
+    <p>Aceita CREATE TABLE, ALTER TABLE ... ADD e CREATE INDEX. O esquema atual será substituído.</p>
+    <textarea id="sql" rows="14" spellcheck="false"></textarea>
+    <div class="actions">
+      <button id="sample" type="button" class="ghost">Usar exemplo</button>
+      <button id="cancel" type="button" class="ghost">Cancelar</button>
+      <button id="do-import" type="button">Importar</button>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
