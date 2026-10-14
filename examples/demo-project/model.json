@@ -1,0 +1,288 @@
+{
+    "tables": [
+        {
+            "id": "tbl_35fb423f8881",
+            "name": "patients",
+            "schema": null,
+            "alias": null,
+            "description": null,
+            "sensitive": false,
+            "columns": [
+                {
+                    "id": "col_33164e7a704f",
+                    "name": "id",
+                    "type": "integer",
+                    "length": null,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "SERIAL",
+                    "nullable": false,
+                    "primaryKey": true,
+                    "unique": false,
+                    "autoIncrement": true,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_be84c6972993",
+                    "name": "name",
+                    "type": "varchar",
+                    "length": 120,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "VARCHAR(120)",
+                    "nullable": false,
+                    "primaryKey": false,
+                    "unique": false,
+                    "autoIncrement": false,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_9f2e0937a0d5",
+                    "name": "email",
+                    "type": "varchar",
+                    "length": 255,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "VARCHAR(255)",
+                    "nullable": true,
+                    "primaryKey": false,
+                    "unique": true,
+                    "autoIncrement": false,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_34c116b8ffd1",
+                    "name": "birth_date",
+                    "type": "date",
+                    "length": null,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "DATE",
+                    "nullable": true,
+                    "primaryKey": false,
+                    "unique": false,
+                    "autoIncrement": false,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "id": "tbl_c7b640ba8bf6",
+            "name": "doctors",
+            "schema": null,
+            "alias": null,
+            "description": null,
+            "sensitive": false,
+            "columns": [
+                {
+                    "id": "col_5ba82368fd72",
+                    "name": "id",
+                    "type": "integer",
+                    "length": null,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "INT",
+                    "nullable": false,
+                    "primaryKey": true,
+                    "unique": false,
+                    "autoIncrement": true,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_34a3427a4a50",
+                    "name": "name",
+                    "type": "varchar",
+                    "length": 100,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "VARCHAR(100)",
+                    "nullable": false,
+                    "primaryKey": false,
+                    "unique": false,
+                    "autoIncrement": false,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                }
+            ],
+            "indexes": []
+        },
+        {
+            "id": "tbl_9ebff6757cae",
+            "name": "appointments",
+            "schema": null,
+            "alias": null,
+            "description": null,
+            "sensitive": false,
+            "columns": [
+                {
+                    "id": "col_4b64b64f00a0",
+                    "name": "id",
+                    "type": "integer",
+                    "length": null,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "SERIAL",
+                    "nullable": false,
+                    "primaryKey": true,
+                    "unique": false,
+                    "autoIncrement": true,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_76c683f053a7",
+                    "name": "patient_id",
+                    "type": "integer",
+                    "length": null,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "INTEGER",
+                    "nullable": false,
+                    "primaryKey": false,
+                    "unique": false,
+                    "autoIncrement": false,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_2dd79525c21b",
+                    "name": "doctor_id",
+                    "type": "integer",
+                    "length": null,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "INT",
+                    "nullable": false,
+                    "primaryKey": false,
+                    "unique": false,
+                    "autoIncrement": false,
+                    "default": null,
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_b4d2f7c51d39",
+                    "name": "price",
+                    "type": "decimal",
+                    "length": null,
+                    "precision": 10,
+                    "scale": 2,
+                    "rawType": "NUMERIC(10,2)",
+                    "nullable": true,
+                    "primaryKey": false,
+                    "unique": false,
+                    "autoIncrement": false,
+                    "default": "0",
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_4477ee9b462e",
+                    "name": "status",
+                    "type": "varchar",
+                    "length": 20,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "VARCHAR(20)",
+                    "nullable": true,
+                    "primaryKey": false,
+                    "unique": false,
+                    "autoIncrement": false,
+                    "default": "'scheduled'",
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                },
+                {
+                    "id": "col_07f4d7848b6d",
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "length": null,
+                    "precision": null,
+                    "scale": null,
+                    "rawType": "TIMESTAMP",
+                    "nullable": true,
+                    "primaryKey": false,
+                    "unique": false,
+                    "autoIncrement": false,
+                    "default": "now()",
+                    "enumId": null,
+                    "description": null,
+                    "sensitive": false
+                }
+            ],
+            "indexes": [
+                {
+                    "id": "idx_b909c2365412",
+                    "name": "idx_appt_patient",
+                    "columns": [
+                        "col_76c683f053a7"
+                    ],
+                    "expression": null,
+                    "unique": false,
+                    "method": null
+                }
+            ]
+        }
+    ],
+    "relationships": [
+        {
+            "id": "ref_074e9d864839",
+            "fromTable": "tbl_9ebff6757cae",
+            "fromColumns": [
+                "col_76c683f053a7"
+            ],
+            "toTable": "tbl_35fb423f8881",
+            "toColumns": [
+                "col_33164e7a704f"
+            ],
+            "cardinality": "many_to_one",
+            "onDelete": "cascade",
+            "onUpdate": "no_action",
+            "name": null,
+            "description": null
+        },
+        {
+            "id": "ref_3c7b52a49404",
+            "fromTable": "tbl_9ebff6757cae",
+            "fromColumns": [
+                "col_2dd79525c21b"
+            ],
+            "toTable": "tbl_c7b640ba8bf6",
+            "toColumns": [
+                "col_5ba82368fd72"
+            ],
+            "cardinality": "many_to_one",
+            "onDelete": "no_action",
+            "onUpdate": "cascade",
+            "name": "fk_doctor",
+            "description": null
+        }
+    ],
+    "enums": [],
+    "groups": []
+}

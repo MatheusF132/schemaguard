@@ -1,0 +1,9 @@
+{
+    "name": "Imported demo",
+    "dialect": "postgresql",
+    "mode": "intermediate",
+    "formatVersion": 1,
+    "createdAt": "2026-10-14T21:37:28+00:00",
+    "updatedAt": "2026-10-14T21:37:28+00:00",
+    "rules": []
+}
