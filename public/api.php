@@ -21,6 +21,10 @@ try {
             ProjectStorage::save($project, $dir);
             @unlink("$dir/layout.json"); // tabelas novas: posicoes novas
             break;
+        case 'save': // o editor manda o projeto inteiro; o PHP valida reconstruindo o modelo
+            $project = Project::fromArray($in['project'] ?? []);
+            ProjectStorage::save($project, $dir);
+            break;
         case 'mode':
             $project = $load();
             $project->mode = Level::from((string) ($in['mode'] ?? 'intermediate'));

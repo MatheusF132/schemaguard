@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SchemaGuard</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="editor.css">
 </head>
 <body>
   <header>
@@ -16,13 +17,17 @@
         <option value="advanced">Avançado</option>
       </select>
     </label>
+    <button id="new-table" type="button">Nova tabela</button>
     <button id="open-import" type="button">Importar SQL</button>
   </header>
 
-  <main id="board">
-    <svg id="links" aria-hidden="true"></svg>
-    <p id="empty" hidden>Nenhuma tabela ainda. Clique em Importar SQL e cole seus CREATE TABLE.</p>
-  </main>
+  <div id="work">
+    <main id="board">
+      <svg id="links" aria-hidden="true"></svg>
+      <p id="empty" hidden>Nenhuma tabela ainda. Clique em Nova tabela ou em Importar SQL.</p>
+    </main>
+    <aside id="panel" hidden></aside>
+  </div>
 
   <dialog id="dlg">
     <h2>Importar SQL</h2>
@@ -36,5 +41,6 @@
   </dialog>
 
   <script src="app.js"></script>
+  <script src="editor.js"></script>
 </body>
 </html>
