@@ -162,9 +162,10 @@ function drawLinks() {
     if (!a || !b) return;
     const y1 = yOf(a, a.querySelector(`[data-col="${r.fromColumns[0]}"]`));
     const y2 = yOf(b, b.querySelector(`[data-col="${r.toColumns[0]}"]`));
-    const self = a === b;
+    // mesma tabela ou tabelas sobrepostas na horizontal: as duas pontas saem pela direita
+    const self = a === b || (a.offsetLeft < b.offsetLeft + b.offsetWidth && b.offsetLeft < a.offsetLeft + a.offsetWidth);
     let x1, x2, d;
-    if (self) { x1 = x2 = a.offsetLeft + a.offsetWidth; d = 50; }
+    if (self) { x1 = a.offsetLeft + a.offsetWidth; x2 = b.offsetLeft + b.offsetWidth; d = 50; }
     else if (a.offsetLeft + a.offsetWidth / 2 <= b.offsetLeft + b.offsetWidth / 2) { x1 = a.offsetLeft + a.offsetWidth; x2 = b.offsetLeft; d = 60; }
     else { x1 = a.offsetLeft; x2 = b.offsetLeft + b.offsetWidth; d = -60; }
 
