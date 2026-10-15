@@ -10,14 +10,6 @@ function setTheme(t) {
 setTheme(document.documentElement.dataset.theme || 'dark');
 themeBtn.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
 
-// area de rolagem maior que a tela, para dar espaco de mover o mapa
-const baseDraw = drawLinks;
-drawLinks = function () {
-  baseDraw();
-  svg.setAttribute('width', Math.max(+svg.getAttribute('width'), board.clientWidth * 2));
-  svg.setAttribute('height', Math.max(+svg.getAttribute('height'), board.clientHeight * 2));
-};
-
 let pan = null;
 let justPanned = false;
 board.addEventListener('pointerdown', (e) => {
@@ -72,3 +64,13 @@ resizer.addEventListener('keydown', (e) => {
   setPanelWidth(panel.offsetWidth + (e.key === 'ArrowRight' ? 20 : -20));
   saveWidth();
 });
+
+// mover tabelas: so enquanto a tecla Espaço estiver pressionada
+const typing = (el) => el.closest('input, textarea, select, button, [contenteditable]') || document.querySelector('dialog[open]');
+window.addEventListener('keydown', (e) => {
+  if (e.code !== 'Space' || typing(e.target)) return;
+  e.preventDefault();
+  document.body.classList.add('space');
+});
+window.addEventListener('keyup', (e) => { if (e.code === 'Space') document.body.classList.remove('space'); });
+window.addEventListener('blur', () => document.body.classList.remove('space'));

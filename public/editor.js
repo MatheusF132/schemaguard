@@ -41,7 +41,7 @@ function drawPanel() {
   const t = cur();
   if (!t) { // o painel fica sempre visivel, assim o mapa nunca muda de lugar ao selecionar
     const list = state.project.tables.map((x) => `<button type="button" class="ghost pick" data-act="select" data-id="${x.id}">${esc(x.name)}</button>`).join('');
-    panel.innerHTML = `<h2>Tabelas</h2>${list ? `<div class="picks">${list}</div>` : ''}<p class="hint">Clique numa tabela do mapa para editá-la. Arraste o fundo do mapa para se mover por ele.</p>`;
+    panel.innerHTML = `<h2>Tabelas</h2>${list ? `<div class="picks">${list}</div>` : ''}<p class="hint">Clique numa tabela do mapa para editá-la. Segure Espaço e arraste para movê-la; arraste o fundo para navegar pelo mapa.</p>`;
     return;
   }
   const p = state.project, beginner = p.mode === 'beginner';

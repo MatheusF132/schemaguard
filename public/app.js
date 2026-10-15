@@ -111,13 +111,14 @@ function render() {
     el.innerHTML = `<div class="head">${esc(t.schema ? t.schema + '.' + t.name : t.name)}</div>`
       + t.columns.map((c) => row(c, p.mode, fk)).join('')
       + (p.mode === 'advanced' ? indexes(t) : '');
-    el.querySelector('.head').addEventListener('pointerdown', (e) => startDrag(e, el, t.id));
+    el.addEventListener('pointerdown', (e) => startDrag(e, el, t.id));
     board.appendChild(el);
   });
   drawLinks();
 }
 
 function startDrag(e, el, id) {
+  if (e.button !== 0 || !document.body.classList.contains('space')) return; // so move com Espaço pressionado
   const sx = e.clientX, sy = e.clientY, ox = el.offsetLeft, oy = el.offsetTop;
   el.setPointerCapture(e.pointerId);
   el.classList.add('drag');
@@ -145,8 +146,9 @@ function drawLinks() {
     w = Math.max(w, el.offsetLeft + el.offsetWidth);
     h = Math.max(h, el.offsetTop + el.offsetHeight);
   });
-  svg.setAttribute('width', w + 120);
-  svg.setAttribute('height', h + 120);
+  // tamanho final de uma vez so: se a area encolhesse por um instante, o navegador "puxaria" a rolagem de volta
+  svg.setAttribute('width', Math.max(w + 120, board.clientWidth * 2));
+  svg.setAttribute('height', Math.max(h + 120, board.clientHeight * 2));
 
   const yOf = (t, r) => t.offsetTop + (r ? r.offsetTop + r.offsetHeight / 2 : t.offsetHeight / 2);
   const text = (x, y, s) => {
