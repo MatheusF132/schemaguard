@@ -43,3 +43,32 @@ board.addEventListener('pointerup', endPan);
 board.addEventListener('pointercancel', endPan);
 // depois de arrastar o mapa, o "click" que o navegador dispara nao deve desselecionar a tabela
 board.addEventListener('click', (e) => { if (justPanned) e.stopImmediatePropagation(); justPanned = false; }, true);
+
+// largura do painel: arrastar a divisoria (cursor col-resize) ou usar as setas do teclado
+const resizer = document.getElementById('resizer');
+const setPanelWidth = (w) => document.documentElement.style.setProperty('--panel-w', Math.min(640, Math.max(260, Math.round(w))) + 'px');
+const saveWidth = () => { try { localStorage.setItem('panelWidth', String(panel.offsetWidth)); } catch (e) { /* ok */ } };
+try { const w = parseInt(localStorage.getItem('panelWidth'), 10); if (w) setPanelWidth(w); } catch (e) { /* ok */ }
+
+resizer.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0) return;
+  resizer.setPointerCapture(e.pointerId);
+  document.body.classList.add('resizing');
+});
+resizer.addEventListener('pointermove', (e) => {
+  if (document.body.classList.contains('resizing')) setPanelWidth(e.clientX - panel.getBoundingClientRect().left);
+});
+function endResize() {
+  if (!document.body.classList.contains('resizing')) return;
+  document.body.classList.remove('resizing');
+  saveWidth();
+  drawLinks();
+}
+resizer.addEventListener('pointerup', endResize);
+resizer.addEventListener('pointercancel', endResize);
+resizer.addEventListener('keydown', (e) => {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  e.preventDefault();
+  setPanelWidth(panel.offsetWidth + (e.key === 'ArrowRight' ? 20 : -20));
+  saveWidth();
+});

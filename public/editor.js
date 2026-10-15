@@ -24,18 +24,26 @@ async function commit() {
   catch (e) { alert('Erro: ' + e.message); run('load'); }
 }
 
+// selecionar so troca o destaque e o painel: o mapa nao e reconstruido (evita "pulos" ao clicar)
+function select(id) {
+  selected = id;
+  board.querySelectorAll('.table').forEach((el) => el.classList.toggle('sel', el.dataset.id === selected));
+  drawPanel();
+}
+
 const baseRender = render;
 render = function () {
   baseRender();
-  if (!cur()) selected = null;
-  board.querySelectorAll('.table').forEach((el) => el.classList.toggle('sel', el.dataset.id === selected));
-  drawPanel();
+  select(cur() ? selected : null);
 };
 
 function drawPanel() {
   const t = cur();
-  panel.hidden = !t;
-  if (!t) return;
+  if (!t) { // o painel fica sempre visivel, assim o mapa nunca muda de lugar ao selecionar
+    const list = state.project.tables.map((x) => `<button type="button" class="ghost pick" data-act="select" data-id="${x.id}">${esc(x.name)}</button>`).join('');
+    panel.innerHTML = `<h2>Tabelas</h2>${list ? `<div class="picks">${list}</div>` : ''}<p class="hint">Clique numa tabela do mapa para editá-la. Arraste o fundo do mapa para se mover por ele.</p>`;
+    return;
+  }
   const p = state.project, beginner = p.mode === 'beginner';
   const L = beginner ? ['identificador único', 'obrigatório', 'valor único'] : ['PK', 'NOT NULL', 'UNIQUE'];
 
@@ -82,8 +90,7 @@ function drawPanel() {
 
 board.addEventListener('click', (e) => {
   const el = e.target.closest('.table');
-  selected = el ? el.dataset.id : null;
-  render();
+  select(el ? el.dataset.id : null);
 });
 
 document.getElementById('new-table').addEventListener('click', async () => {
@@ -134,6 +141,7 @@ panel.addEventListener('click', (e) => {
   const b = e.target.closest('[data-act]');
   if (!b) return;
   const t = cur(), p = state.project, a = b.dataset.act;
+  if (a === 'select') { select(b.dataset.id); return; }
   if (a === 'add-col') {
     t.columns.push({ id: uid('col'), name: uniqueName(t.columns, 'column'), type: 'varchar', length: 255 });
   } else if (a === 'del-col') {
