@@ -15,3 +15,15 @@
 .form label { display: grid; gap: 2px; font-size: 12px; }
 .danger { margin-top: 18px; color: #ff8a8a; border-color: #5a2c34; }
 .table.sel { border-color: var(--key); }
+
+#out { width: min(760px, 94vw); max-height: 88vh; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+#out::backdrop { background: rgba(0, 0, 0, .55); }
+#out h2 { margin: 0 0 10px; font-size: 16px; }
+#out label { margin-bottom: 10px; }
+#out pre { max-height: 40vh; margin: 8px 0; padding: 10px; overflow: auto; font: 12.5px ui-monospace, Consolas, monospace; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
+.changes { margin: 0 0 8px; padding: 0; list-style: none; }
+.changes li { padding: 5px 0; border-top: 1px solid var(--line); }
+.risk { margin-right: 6px; padding: 1px 6px; font-size: 11px; border: 1px solid currentColor; border-radius: 4px; }
+.risk.safe { color: var(--link); }
+.risk.attention { color: var(--key); }
+.risk.destructive { color: #ff8a8a; }
