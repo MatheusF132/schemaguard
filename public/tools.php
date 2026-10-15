@@ -6,6 +6,7 @@ use SchemaGuard\Diff\SchemaDiffer;
 use SchemaGuard\Model\Project;
 use SchemaGuard\Sql\SqlGenerator;
 use SchemaGuard\Storage\ProjectStorage;
+use SchemaGuard\Validation\Validator;
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -51,6 +52,9 @@ try {
             break;
         case 'sql':
             echo json_encode(['sql' => SqlGenerator::migration(SchemaDiffer::diff(new Project(name: ''), $current), $dialect)], $flags);
+            break;
+        case 'validate':
+            echo json_encode(['findings' => Validator::run($current)], $flags);
             break;
         default:
             throw new RuntimeException('Ação desconhecida.');

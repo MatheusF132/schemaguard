@@ -15,8 +15,9 @@ async function tool(action, body = {}) {
   return data;
 }
 
-async function openOut(title, load) {
+async function openOut(title, load, withDialect = true) {
   document.getElementById('out-title').textContent = title;
+  document.getElementById('dialect').closest('label').hidden = !withDialect;
   again = async () => {
     try { outBody.innerHTML = await load(); }
     catch (e) { outBody.innerHTML = `<p class="hint">${esc(e.message)}</p>`; }
@@ -54,3 +55,33 @@ document.getElementById('copy').addEventListener('click', () => {
   const pre = outBody.querySelector('pre');
   if (pre) navigator.clipboard.writeText(pre.textContent);
 });
+
+// ---- verificacao do esquema (regras filtradas pelo modo) ----
+const RANK = { beginner: 0, intermediate: 1, advanced: 2 };
+let findings = [];
+let seq = 0;
+const visible = () => findings.filter((f) => RANK[f.level] <= RANK[state.project.mode]);
+
+function paint() {
+  const v = visible();
+  document.getElementById('verify').textContent = v.length ? `Verificar (${v.length})` : 'Verificar';
+  const ids = new Set(v.map((f) => f.table));
+  board.querySelectorAll('.table').forEach((el) => el.classList.toggle('warn', ids.has(el.dataset.id)));
+}
+
+const prevRender = render;
+render = function () {
+  prevRender();
+  paint();
+  const mine = ++seq;
+  tool('validate').then((d) => { if (mine === seq) { findings = d.findings; paint(); } }).catch(() => {});
+};
+
+document.getElementById('verify').addEventListener('click', () => openOut('Verificação do esquema', async () => {
+  findings = (await tool('validate')).findings;
+  paint();
+  const v = visible(), mode = state.project.mode, det = mode === 'beginner' ? ' open' : '';
+  if (!v.length) return '<p class="hint">Nenhum problema encontrado para este modo.</p>';
+  return '<ul class="changes">' + v.map((f) => `<li>${esc(f.message)}<details${det}><summary>Por quê?</summary><p class="hint">${esc(f.explanation)}</p></details></li>`).join('') + '</ul>'
+    + (mode === 'advanced' ? '' : '<p class="hint">Troque para um modo mais avançado para ver verificações mais detalhadas.</p>');
+}, false));

@@ -6,6 +6,7 @@
   <title>SchemaGuard</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="editor.css">
+  <script>document.documentElement.dataset.theme = localStorage.getItem('theme') || 'dark';</script>
 </head>
 <body>
   <header>
@@ -21,15 +22,17 @@
     <button id="save-version" type="button">Salvar versão</button>
     <button id="compare" type="button">Comparar</button>
     <button id="export-sql" type="button">Exportar SQL</button>
+    <button id="verify" type="button">Verificar</button>
     <button id="open-import" type="button">Importar SQL</button>
+    <button id="theme" type="button" class="ghost">Tema claro</button>
   </header>
 
   <div id="work">
+    <aside id="panel" hidden></aside>
     <main id="board">
       <svg id="links" aria-hidden="true"></svg>
       <p id="empty" hidden>Nenhuma tabela ainda. Clique em Nova tabela ou em Importar SQL.</p>
     </main>
-    <aside id="panel" hidden></aside>
   </div>
 
   <dialog id="dlg">
@@ -61,5 +64,6 @@
   <script src="app.js"></script>
   <script src="editor.js"></script>
   <script src="tools.js"></script>
+  <script src="view.js"></script>
 </body>
 </html>
