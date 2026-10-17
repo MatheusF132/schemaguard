@@ -4,6 +4,7 @@ require __DIR__ . '/../src/autoload.php';
 
 use SchemaGuard\Analyzer\PhpAnalyzer;
 use SchemaGuard\Diff\SchemaDiffer;
+use SchemaGuard\Export\DbmlExporter;
 use SchemaGuard\Model\Project;
 use SchemaGuard\Sql\SqlGenerator;
 use SchemaGuard\Storage\ProjectStorage;
@@ -83,7 +84,10 @@ try {
             echo is_file($uf) ? (string) file_get_contents($uf) : json_encode(['path' => '', 'scannedAt' => null, 'files' => 0, 'usages' => []]);
             break;
         case 'sql':
-            echo json_encode(['sql' => SqlGenerator::migration(SchemaDiffer::diff(new Project(name: ''), $current), $dialect)], $flags);
+            $sql = ($in['dialect'] ?? '') === 'dbml'
+                ? DbmlExporter::export($current)
+                : SqlGenerator::migration(SchemaDiffer::diff(new Project(name: ''), $current), $dialect);
+            echo json_encode(['sql' => $sql], $flags);
             break;
         case 'validate':
             echo json_encode(['findings' => Validator::run($current)], $flags);

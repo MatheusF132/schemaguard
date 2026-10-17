@@ -74,3 +74,78 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => { if (e.code === 'Space') document.body.classList.remove('space'); });
 window.addEventListener('blur', () => document.body.classList.remove('space'));
+
+// atalhos: Ctrl+Z desfaz, Ctrl+Y (ou Ctrl+Shift+Z) refaz; nos campos de texto vale o desfazer do proprio campo
+window.addEventListener('keydown', (e) => {
+  if (!(e.ctrlKey || e.metaKey) || typing(e.target)) return;
+  const k = e.key.toLowerCase();
+  if (k === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
+  else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); redo(); }
+});
+
+// Organizar: camadas a partir da tabela mais ligada, ordenadas para reduzir cruzamentos; tabelas sem ligacao vao para uma grade embaixo
+function arrange() {
+  const p = state.project;
+  if (!p.tables.length) return;
+  const el = (id) => board.querySelector(`[data-id="${id}"]`);
+  const adj = new Map(p.tables.map((t) => [t.id, new Set()]));
+  p.relationships.forEach((r) => {
+    if (r.fromTable !== r.toTable && adj.has(r.fromTable) && adj.has(r.toTable)) {
+      adj.get(r.fromTable).add(r.toTable);
+      adj.get(r.toTable).add(r.fromTable);
+    }
+  });
+
+  const seen = new Set(), comps = [];
+  [...p.tables].sort((a, b) => adj.get(b.id).size - adj.get(a.id).size).forEach((t) => {
+    if (seen.has(t.id)) return;
+    seen.add(t.id);
+    const layers = [[t.id]];
+    for (let i = 0; i < layers.length; i++) {
+      const next = [];
+      layers[i].forEach((id) => adj.get(id).forEach((n) => { if (!seen.has(n)) { seen.add(n); next.push(n); } }));
+      if (next.length) layers.push(next);
+    }
+    comps.push(layers);
+  });
+
+  const GAP_X = 120, GAP_Y = 40, layout = {};
+  let top = 40;
+  comps.filter((c) => c.length > 1 || c[0].length > 1).forEach((layers) => {
+    const pos = new Map();
+    layers.forEach((layer, i) => {
+      if (i > 0) {
+        const bary = (id) => {
+          const ns = [...adj.get(id)].filter((n) => pos.has(n));
+          return ns.length ? ns.reduce((s, n) => s + pos.get(n), 0) / ns.length : 0;
+        };
+        layer.sort((a, b) => bary(a) - bary(b));
+      }
+      layer.forEach((id, j) => pos.set(id, j));
+    });
+    const heights = layers.map((layer) => layer.reduce((s, id) => s + el(id).offsetHeight + GAP_Y, -GAP_Y));
+    const tall = Math.max(...heights);
+    let x = 40;
+    layers.forEach((layer, i) => {
+      let y = top + (tall - heights[i]) / 2;
+      layer.forEach((id) => { layout[id] = { x, y }; y += el(id).offsetHeight + GAP_Y; });
+      x += Math.max(...layer.map((id) => el(id).offsetWidth)) + GAP_X;
+    });
+    top += tall + 80;
+  });
+
+  const alone = comps.filter((c) => c.length === 1 && c[0].length === 1).map((c) => c[0][0]);
+  let x = 40, y = top, rowH = 0;
+  alone.forEach((id, j) => {
+    if (j > 0 && j % 4 === 0) { y += rowH + GAP_Y; rowH = 0; x = 40; }
+    layout[id] = { x, y };
+    x += el(id).offsetWidth + 40;
+    rowH = Math.max(rowH, el(id).offsetHeight);
+  });
+
+  state.layout = layout;
+  saveLayout();
+  render();
+  board.scrollTo(0, 0);
+}
+document.getElementById('arrange').addEventListener('click', arrange);

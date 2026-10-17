@@ -20,10 +20,55 @@ function uniqueName(list, base) {
   return `${base}_${i}`;
 }
 
+// historico: guarda o projeto como estava antes de cada edicao (sem o updatedAt, que muda a cada salvamento)
+const snap = (p) => JSON.stringify({ ...p, updatedAt: null });
+const history = { undo: [], redo: [] };
+let lastSaved = null;
+
+function updateHistoryButtons() {
+  document.getElementById('undo').disabled = !history.undo.length;
+  document.getElementById('redo').disabled = !history.redo.length;
+}
+
 async function commit() {
-  try { state = await call('save', { project: state.project }); render(); }
+  const before = lastSaved;
+  try {
+    state = await call('save', { project: state.project });
+    if (before && before !== snap(state.project)) {
+      history.undo.push(before);
+      if (history.undo.length > 50) history.undo.shift();
+      history.redo = [];
+    }
+    render();
+  } catch (e) { alert('Erro: ' + e.message); run('load'); }
+}
+
+async function restore(from, to) {
+  const s = from.pop();
+  if (!s) return;
+  to.push(snap(state.project));
+  const p = JSON.parse(s);
+  p.mode = state.project.mode; // desfazer nao troca o modo
+  p.updatedAt = state.project.updatedAt;
+  try { state = await call('save', { project: p }); render(); }
   catch (e) { alert('Erro: ' + e.message); run('load'); }
 }
+const undo = () => restore(history.undo, history.redo);
+const redo = () => restore(history.redo, history.undo);
+document.getElementById('undo').addEventListener('click', undo);
+document.getElementById('redo').addEventListener('click', redo);
+
+// importar SQL tambem pode ser desfeito
+const baseRun = run;
+run = async function (action, body) {
+  const before = state.project ? snap(state.project) : null;
+  await baseRun(action, body);
+  if (action === 'import' && before && snap(state.project) !== before) {
+    history.undo.push(before);
+    history.redo = [];
+    updateHistoryButtons();
+  }
+};
 
 // selecionar so troca o destaque e o painel: o mapa nao e reconstruido (evita "pulos" ao clicar)
 function select(id) {
@@ -35,6 +80,8 @@ function select(id) {
 const baseRender = render;
 render = function () {
   baseRender();
+  lastSaved = snap(state.project);
+  updateHistoryButtons();
   select(cur() ? selected : null);
 };
 

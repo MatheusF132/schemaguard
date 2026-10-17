@@ -32,8 +32,12 @@ document.getElementById('save-version').addEventListener('click', async () => {
   try { await tool('snapshot', { label }); alert('Versão salva.'); } catch (e) { alert('Erro: ' + e.message); }
 });
 
-document.getElementById('export-sql').addEventListener('click', () =>
-  openOut('SQL do esquema atual', async () => `<pre>${esc((await tool('sql', { dialect: dialect() })).sql)}</pre>`));
+let fmt = 'postgresql';
+document.getElementById('export-sql').addEventListener('click', () => openOut('Exportar esquema', async () => {
+  const d = await tool('sql', { dialect: fmt });
+  const formats = [['postgresql', 'SQL (PostgreSQL)'], ['mysql', 'SQL (MySQL)'], ['dbml', 'DBML (dbdiagram.io)']];
+  return `<label>Formato<select id="fmt">${formats.map(([v, l]) => `<option value="${v}"${v === fmt ? ' selected' : ''}>${l}</option>`).join('')}</select></label><pre>${esc(d.sql)}</pre>`;
+}, false));
 
 document.getElementById('compare').addEventListener('click', () => openOut('Comparar versões', async () => {
   const { versions } = await tool('versions');
@@ -48,7 +52,7 @@ document.getElementById('compare').addEventListener('click', () => openOut('Comp
     + (d.sql ? `<h3>Migração sugerida</h3><pre>${esc(d.sql)}</pre>` : '');
 }));
 
-outBody.addEventListener('change', (e) => { if (e.target.id === 'ver') { ver = e.target.value; again(); } });
+outBody.addEventListener('change', (e) => { if (e.target.id === 'ver') { ver = e.target.value; again(); } else if (e.target.id === 'fmt') { fmt = e.target.value; again(); } });
 document.getElementById('dialect').addEventListener('change', () => again && again());
 document.getElementById('out-close').addEventListener('click', () => out.close());
 document.getElementById('copy').addEventListener('click', () => {
