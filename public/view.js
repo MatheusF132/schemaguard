@@ -13,7 +13,7 @@ themeBtn.addEventListener('click', () => setTheme(document.documentElement.datas
 let pan = null;
 let justPanned = false;
 board.addEventListener('pointerdown', (e) => {
-  if (e.button !== 0 || e.target.closest('.table')) return;
+  if (e.button !== 0 || e.target.closest('.table') || !document.body.classList.contains('space')) return; // o mapa so se move com Espaço
   pan = { x: e.clientX, y: e.clientY, left: board.scrollLeft, top: board.scrollTop, moved: false };
   board.setPointerCapture(e.pointerId);
   board.classList.add('panning');

@@ -118,7 +118,7 @@ function render() {
 }
 
 function startDrag(e, el, id) {
-  if (e.button !== 0 || !document.body.classList.contains('space')) return; // so move com Espaço pressionado
+  if (e.button !== 0) return;
   const sx = e.clientX, sy = e.clientY, ox = el.offsetLeft, oy = el.offsetTop;
   el.setPointerCapture(e.pointerId);
   el.classList.add('drag');

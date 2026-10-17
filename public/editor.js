@@ -2,6 +2,7 @@
 // Edicao de tabelas, colunas e relacionamentos. Usa state, render, call, run e board do app.js.
 
 let selected = null;
+let usageData = []; // usos no codigo (preenchido pelo tools.js)
 const panel = document.getElementById('panel');
 const TYPES = ['integer', 'bigint', 'smallint', 'varchar', 'char', 'text', 'decimal', 'double', 'boolean', 'date', 'timestamp', 'uuid', 'json'];
 const ACTIONS = [['no_action', 'nada'], ['cascade', 'apagar junto'], ['restrict', 'impedir'], ['set_null', 'deixar vazio']];
@@ -41,10 +42,18 @@ function drawPanel() {
   const t = cur();
   if (!t) { // o painel fica sempre visivel, assim o mapa nunca muda de lugar ao selecionar
     const list = state.project.tables.map((x) => `<button type="button" class="ghost pick" data-act="select" data-id="${x.id}">${esc(x.name)}</button>`).join('');
-    panel.innerHTML = `<h2>Tabelas</h2>${list ? `<div class="picks">${list}</div>` : ''}<p class="hint">Clique numa tabela do mapa para editá-la. Segure Espaço e arraste para movê-la; arraste o fundo para navegar pelo mapa.</p>`;
+    panel.innerHTML = `<h2>Tabelas</h2>${list ? `<div class="picks">${list}</div>` : ''}<p class="hint">Clique numa tabela do mapa para editá-la e arraste para movê-la. Segure Espaço e arraste o fundo para navegar pelo mapa.</p>`;
     return;
   }
   const p = state.project, beginner = p.mode === 'beginner';
+  const uses = usageData.filter((u) => u.table === t.id);
+  const useBadge = (c) => {
+    const n = uses.filter((u) => u.column === c.id).length;
+    return n ? `<span class="uses" title="Lugares do código que usam esta coluna">${n} uso${n > 1 ? 's' : ''} no código</span>` : '';
+  };
+  const usageHtml = uses.length
+    ? `<details><summary>${uses.length} lugar${uses.length > 1 ? 'es' : ''} no código</summary><ul class="impact">${uses.slice(0, 40).map((u) => `<li><code>${esc(u.file)}:${u.line}</code> ${esc(u.op)}</li>`).join('')}</ul></details>`
+    : '<p class="hint">Nenhum uso encontrado, ou o código ainda não foi analisado (botão Analisar código).</p>';
   const L = beginner ? ['identificador único', 'obrigatório', 'valor único'] : ['PK', 'NOT NULL', 'UNIQUE'];
 
   const cols = t.columns.map((c) => {
@@ -57,7 +66,7 @@ function drawPanel() {
       <select data-f="type" data-col="${c.id}" aria-label="tipo">${opts(types.map((x) => [x, x]), c.type)}</select>
       ${len}
       <button type="button" class="ghost" data-act="del-col" data-col="${c.id}" aria-label="apagar coluna">✕</button>
-      <div class="flags">${flag('primaryKey', L[0], c.primaryKey)}${flag('required', L[1], !c.nullable)}${flag('unique', L[2], c.unique)}</div>
+      <div class="flags">${flag('primaryKey', L[0], c.primaryKey)}${flag('required', L[1], !c.nullable)}${flag('unique', L[2], c.unique)}${useBadge(c)}</div>
     </div>`;
   }).join('');
 
@@ -85,6 +94,8 @@ function drawPanel() {
     ${beginner ? '<p class="hint">Um relacionamento liga uma coluna desta tabela ao identificador de outra tabela.</p>' : ''}
     ${rels || '<p class="hint">Nenhum ainda.</p>'}
     ${form}
+    <h3>Uso no código</h3>
+    ${usageHtml}
     <button type="button" class="danger" data-act="del-table">Apagar tabela</button>`;
 }
 

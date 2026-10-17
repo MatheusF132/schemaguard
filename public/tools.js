@@ -41,7 +41,7 @@ document.getElementById('compare').addEventListener('click', () => openOut('Comp
   if (!versions.some((v) => v.id === ver)) ver = versions[0].id;
   const d = await tool('diff', { version: ver, dialect: dialect() });
   const list = d.changes.length
-    ? '<ul class="changes">' + d.changes.map((c) => `<li><span class="risk ${c.risk}">${RISK[c.risk]}</span>${esc(c.text)}</li>`).join('') + '</ul>'
+    ? '<ul class="changes">' + d.changes.map((c) => `<li><span class="risk ${c.risk}">${RISK[c.risk]}</span>${esc(c.text)}${impactHtml(c)}</li>`).join('') + '</ul>'
     : '<p class="hint">Nenhuma diferença desde essa versão.</p>';
   const options = versions.map((v) => `<option value="${v.id}"${v.id === ver ? ' selected' : ''}>${esc(v.label)} (${esc(v.createdAt.slice(0, 16).replace('T', ' '))})</option>`).join('');
   return `<label>Comparar o esquema atual com<select id="ver">${options}</select></label>${list}`
@@ -85,3 +85,51 @@ document.getElementById('verify').addEventListener('click', () => openOut('Verif
   return '<ul class="changes">' + v.map((f) => `<li>${esc(f.message)}<details${det}><summary>Por quê?</summary><p class="hint">${esc(f.explanation)}</p></details></li>`).join('') + '</ul>'
     + (mode === 'advanced' ? '' : '<p class="hint">Troque para um modo mais avançado para ver verificações mais detalhadas.</p>');
 }, false));
+
+// ---- analise de impacto no codigo PHP ----
+function impactHtml(c) {
+  if (!c.impactCount) return '';
+  const items = c.impact.map((i) => `<li><code>${esc(i.file)}:${i.line}</code> ${esc(i.snippet)}</li>`).join('');
+  const more = c.impactCount > c.impact.length ? `<li>... e mais ${c.impactCount - c.impact.length}</li>` : '';
+  return `<details><summary>Ver onde (${c.impactCount})</summary><ul class="impact">${items}${more}</ul></details>`;
+}
+
+function scanSummary(d) {
+  const rows = state.project.tables.map((t) => {
+    const u = d.usages.filter((x) => x.table === t.id);
+    const star = u.some((x) => x.kind === 'star');
+    const unused = star ? [] : t.columns.filter((c) => !u.some((x) => x.column === c.id)).map((c) => c.name);
+    return `<li><strong>${esc(t.name)}</strong>: ${u.length ? u.length + ' usos' : 'nenhum uso encontrado'}`
+      + (u.length && unused.length ? ` · colunas sem uso: ${esc(unused.join(', '))}` : '') + '</li>';
+  }).join('');
+  return `<h3>Resultado (${d.files} arquivos, ${esc(d.scannedAt.slice(0, 16).replace('T', ' '))})</h3><ul class="changes">${rows}</ul>`
+    + '<p class="hint">A análise lê o SQL escrito nas strings do PHP e chaves de array. Consultas montadas dinamicamente ou via ORM podem não aparecer.</p>';
+}
+
+document.getElementById('scan').addEventListener('click', () => openOut('Analisar código PHP', async () => {
+  const d = await tool('usages');
+  usageData = d.usages;
+  const intro = d.scannedAt ? scanSummary(d)
+    : '<p class="hint">Informe a pasta do seu projeto PHP. O SchemaGuard procura, nos arquivos .php, onde cada tabela e coluna aparece em comandos SQL.</p>';
+  return `<label>Pasta do projeto PHP<input type="text" id="scan-path" value="${esc(d.path || '')}" placeholder="C:\\projetos\\meu-sistema"></label>`
+    + `<button type="button" id="run-scan">Analisar</button>${intro}`;
+}, false));
+
+outBody.addEventListener('click', async (e) => {
+  if (e.target.id !== 'run-scan') return;
+  const btn = e.target;
+  btn.disabled = true;
+  btn.textContent = 'Analisando...';
+  try {
+    const d = await tool('scan', { path: document.getElementById('scan-path').value });
+    usageData = d.usages;
+    if (state.project) select(selected);
+    await again();
+  } catch (err) {
+    alert('Erro: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Analisar';
+  }
+});
+
+tool('usages').then((d) => { usageData = d.usages; if (state.project) select(selected); }).catch(() => {});
