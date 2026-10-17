@@ -107,14 +107,14 @@ function scanSummary(d) {
       + (u.length && unused.length ? ` · colunas sem uso: ${esc(unused.join(', '))}` : '') + '</li>';
   }).join('');
   return `<h3>Resultado (${d.files} arquivos, ${esc(d.scannedAt.slice(0, 16).replace('T', ' '))})</h3><ul class="changes">${rows}</ul>`
-    + '<p class="hint">A análise lê o SQL escrito nas strings do PHP e chaves de array. Consultas montadas dinamicamente ou via ORM podem não aparecer.</p>';
+    + '<p class="hint">A análise lê o SQL escrito no PHP e o uso de models do Laravel (Eloquent e Query Builder). É uma aproximação: consultas montadas dinamicamente podem não aparecer.</p>';
 }
 
 document.getElementById('scan').addEventListener('click', () => openOut('Analisar código PHP', async () => {
   const d = await tool('usages');
   usageData = d.usages;
   const intro = d.scannedAt ? scanSummary(d)
-    : '<p class="hint">Informe a pasta do seu projeto PHP. O SchemaGuard procura, nos arquivos .php, onde cada tabela e coluna aparece em comandos SQL.</p>';
+    : '<p class="hint">Informe a pasta do seu projeto PHP. O SchemaGuard procura, nos arquivos .php, onde cada tabela e coluna aparece (SQL escrito no código e models do Laravel).</p>';
   return `<label>Pasta do projeto PHP<input type="text" id="scan-path" value="${esc(d.path || '')}" placeholder="C:\\projetos\\meu-sistema"></label>`
     + `<button type="button" id="run-scan">Analisar</button>${intro}`;
 }, false));

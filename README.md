@@ -11,7 +11,7 @@ Editor visual de esquemas de banco de dados (alternativa ao dbdiagram.io) que ta
 - **Importar SQL** (`CREATE TABLE`, `ALTER TABLE ... ADD`, `CREATE INDEX`, estilo PostgreSQL e MySQL).
 - **Versões e comparação**: salve versões e veja o que mudou, com o risco de cada mudança (seguro, atenção, perigoso) e a **migração em SQL** sugerida. O SchemaGuard só mostra o SQL; nunca executa nada.
 - **Verificação do esquema**: sem chave primária, relacionamentos prováveis ausentes, tipos incompatíveis, FK sem índice, colunas repetidas etc.
-- **Análise de impacto (PHP)**: lê o SQL escrito no seu projeto PHP e mostra onde cada tabela e coluna é usada, e o que quebra ao apagar ou renomear.
+- **Análise de impacto (PHP e Laravel)**: lê o SQL escrito no seu projeto, os models do Eloquent e o Query Builder, e mostra onde cada tabela e coluna é usada e o que quebra ao apagar ou renomear.
 - **Exportar**: SQL (PostgreSQL ou MySQL) e DBML.
 - Desfazer/refazer, tema claro e escuro.
 
@@ -43,10 +43,10 @@ public           interface (HTML, CSS, JS) e a API em PHP
 
 ## Limitações conhecidas
 
-- A análise de impacto só enxerga SQL escrito direto no PHP e chaves de array; ORMs (Eloquent etc.) e outras linguagens ainda não.
-- A comparação ainda não cobre mudanças em chaves primárias, únicos e índices.
+- A análise de impacto é uma aproximação (consultas montadas dinamicamente podem não aparecer) e só lê PHP; JavaScript e Python ainda não.
+- Os nomes de constraints geradas na migração seguem o padrão do banco; confira se o seu usa outros nomes.
 - Importar DBML ainda não existe (só exportar).
 
 ## Próximos passos
 
-Analisadores para mais stacks (Laravel/Eloquent, JavaScript, Python), conexão direta com bancos reais e comparação com o diagrama, e integração visual com Git.
+Analisadores para mais stacks (JavaScript/Prisma, Python/Django), conexão direta com bancos reais e comparação com o diagrama, e integração visual com Git.
